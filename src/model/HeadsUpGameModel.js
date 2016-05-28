@@ -59,18 +59,17 @@ export default class HeadsUpGameModel {
     while ((currentPlayerIndex = this.searchNextPlayerIndex()) !== NON_EXIST_PLAYER_INDEX) {
       let brain = this.playerBrains[currentPlayerIndex],
         currentPlayerAction,
-        winner;
+        survivor;
       brain.decideAction(this.currentCallValue);
       // 1人以外全員フォールドしたかどうか
-      winner = this.getWinner();
-      if (winner !== null) {
+      survivor = this.getOneSurvivor();
+      if (survivor !== null) {
         this.collectChipsToPod();
-        winner.getPlayer().addStack(this.board.getPot());
         return END;
       }
       // オリジナルレイザーが変わった場合
       currentPlayerAction = brain.getAction();
-      if (currentPlayerAction.name === RAISE || currentPlayerAction.name === ALLIN) {
+      if (currentPlayerAction.name === RAISE || (currentPlayerAction.name === ALLIN && currentPlayerAction.value > this.currentCallValue)) {
         this.originalRaiserIndex = currentPlayerIndex;
         this.currentCallValue = currentPlayerAction.value;
       }
@@ -105,7 +104,7 @@ export default class HeadsUpGameModel {
     return NON_EXIST_PLAYER_INDEX;
   }
 
-  getWinner() {
+  getOneSurvivor() {
     let survivors = this.playerBrains.filter((brain)=>{
       let action = branin.getAction();
       return action === null || action.name !== FOLD;
@@ -149,7 +148,27 @@ export default class HeadsUpGameModel {
     this.board.setCard(this.dealer.getNextCard());
   }
 
-  showDown() {
+  getWinners() {
+    let boardCards = this.board.getOpenedCards();
+      bestRank = new Rank(NO_PAIR, 0, 0),
+      winners = [];
+    this.playerBrains.forEach((brain)=>{
+      let rank = brain.getPlayer().getRank(boardCards),
+        comparedResult = RankUtil.compareRanks(rank, bestRank);
+      if (comparedResult === 1) {
+        bestRank = rank;
+        winners = [brain];
+      } else if (comparedResult === 0) {
+        winners.push(brain);
+      }
+    });
+    return winners;
+  }
 
+  sharePodToWinners(winnerBrains) {
+    let pot = this.board.getPot() / winnerBrains.length;
+    winnerBrains.forEach((brain)=>{
+      brain.getPlayer().addStack(pod);
+    });
   }
 }

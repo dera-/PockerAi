@@ -1,4 +1,5 @@
 import Card from 'Card';
+import RankUtil from '../util/RankUtil';
 
 export default class Player {
   constructor(money) {
@@ -28,7 +29,7 @@ export default class Player {
     return this.stack;
   }
 
-  getRank(openCards) {
-
+  getRank(openedCards) {
+    return RankUtil.getRank(this.hand, openedCards);
   }
 }

@@ -1,9 +1,8 @@
 export default class Rank {
-  constructor(strength, score, top, bottom = 0, kicker = 0) {
+  constructor(strength, top, bottom = 0, kickers = [0, 0, 0]) {
     this.strength = strength;
-    this.score = score;
     this.top   = top;
     this.bottom = bottom;
-    this.kicker = kicker;
+    this.kickers = kickers;
   }
 }

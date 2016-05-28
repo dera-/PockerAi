@@ -4,6 +4,10 @@ export default class Board {
     this.chipPot = 0;
   }
 
+  getOpenedCards() {
+    return this.openedCards;
+  }
+
   setCard(card) {
     this.openedCards.push(card);
   }

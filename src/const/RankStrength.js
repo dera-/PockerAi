@@ -7,3 +7,4 @@ export const STRAIGHT  = 5;
 export const THREE_CARD = 4;
 export const TWO_PAIR  = 3;
 export const ONE_PAIR  = 2;
+export const NO_PAIR  = 1;
