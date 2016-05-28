@@ -1,13 +1,13 @@
 import PlayerBrain from 'PlayerBrain';
 import CardsFactory from '../factory/CardsFactory';
 import {ALLIN, RAISE, CALL, CHECK, FOLD, NONE} from '../const/ActionName';
-import {NEXT, END, SHOWDOWN, GAMESET} from '../const/GameState';
+import {NEXT, END, SHOWDOWN} from '../const/GameState';
 
 const HAND_CARDS_NUM = 2;
 const FROP_CARDS_NUM = 3;
 const NON_EXIST_PLAYER_INDEX = -1;
 
-export default class HeadsUpGameModel {
+export default class TexasHoldemModel {
   constructor(playerBrains, initialBigBlind) {
     this.playerBrains = playerBrains;
     this.dealer = new Dealer((new CardsFactory()).generate());
@@ -18,6 +18,23 @@ export default class HeadsUpGameModel {
     this.currentCallValue = initialBigBlind;
     this.utgIndex = 0;
     this.currentActoinIndex = this.utgIndex;
+  }
+
+  /**
+   * ゲームが終了したかどうかの判定
+   */
+  isFinished() {
+    return this.playerBrains.length <= 1;
+  }
+
+  /**
+   * スタックが0になったプレイヤーをゲーム内から除外する処理
+   * TODO: ヘッズアップならこれでいいけど、３人以上のゲームだと次にアクションが始まる位置がおかしなことになるので要修正
+   */
+  deleteDeadPlayer() {
+    this.playerBrains = this.playerBrains.filter((brain)=>{
+      return brain.getPlayer().isAlive();
+    });
   }
 
   dealCards() {

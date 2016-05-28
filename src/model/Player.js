@@ -2,10 +2,15 @@ import Card from 'Card';
 import RankUtil from '../util/RankUtil';
 
 export default class Player {
-  constructor(money) {
+  constructor(id, money) {
+    this.id = id;
     this.stack = money;
     this.hand = null;
     this.rank = null;
+  }
+
+  isAlive() {
+    return this.stack > 0;
   }
 
   setCard(cards) {
