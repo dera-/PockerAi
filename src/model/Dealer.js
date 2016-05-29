@@ -7,7 +7,7 @@ export default class Dealer {
 
   shuffleCards() {
     this.index = 0;
-    let random = this.card.map(Math.random);
+    let random = this.cards.map(Math.random);
     this.cards.sort((a,b) => random[a] - random[b]);
   }
 

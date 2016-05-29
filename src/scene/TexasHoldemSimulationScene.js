@@ -2,6 +2,7 @@ import {NEXT, END, SHOWDOWN} from '../const/GameState';
 import {PRE_FLOP, FLOP, TURN, RIVER} from '../const/ActionPhase';
 import Player from '../model/Player';
 import PlayerBrain from '../model/PlayerBrain';
+import TexasHoldemModel from '../model/TexasHoldemModel';
 
 export default class TexasHoldemSimulationScene {
   constructor(times, bigBlind, initialStack) {
@@ -12,9 +13,11 @@ export default class TexasHoldemSimulationScene {
 
   run() {
     let players = [new PlayerBrain(new Player(1, this.initialStack)), new PlayerBrain(new Player(2, this.initialStack))],
-      gameModel = new TexasHoldemModel(this.players, this.bigBlind);
+      gameModel = new TexasHoldemModel(players, this.bigBlind);
     for (let num = 0; num < this.similationTimes; num++) {
+      console.log("game"+num+'開始');
       this.oneGame(gameModel);
+      console.log("game"+num+'完了');
     }
   }
 
@@ -31,6 +34,7 @@ export default class TexasHoldemSimulationScene {
       winners;
     gameModel.dealCards();
     for (currentPhase = PRE_FLOP; currentPhase <= RIVER; currentPhase++) {
+      console.log('phase:'+currentPhase);
       if (currentPhase === FLOP) {
         gameModel.startFrop();
       } else if (currentPhase > FLOP) {
@@ -42,6 +46,7 @@ export default class TexasHoldemSimulationScene {
       if (gameState === END) {
         break;
       }
+      gameModel.resetPlayersAction();
     }
     winners = gameModel.getWinners();
     gameModel.sharePodToWinners(winners);

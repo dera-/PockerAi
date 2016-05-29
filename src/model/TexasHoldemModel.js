@@ -1,4 +1,6 @@
-import PlayerBrain from 'PlayerBrain';
+import PlayerBrain from './PlayerBrain';
+import Dealer from './Dealer';
+import Board from './Board';
 import CardsFactory from '../factory/CardsFactory';
 import {ALLIN, RAISE, CALL, CHECK, FOLD, NONE} from '../const/ActionName';
 import {NEXT, END, SHOWDOWN} from '../const/GameState';
@@ -13,11 +15,12 @@ export default class TexasHoldemModel {
     this.dealer = new Dealer((new CardsFactory()).generate());
     this.board = new Board();
 
-    this.originalRaiserIndex = NON_EXIST_PLAYER_INDEX;
     this.bigBlind = initialBigBlind;
-    this.currentCallValue = initialBigBlind;
     this.utgIndex = 0;
+
     this.currentActoinIndex = this.utgIndex;
+    this.originalRaiserIndex = NON_EXIST_PLAYER_INDEX;
+    this.currentCallValue = initialBigBlind;
   }
 
   /**
@@ -39,40 +42,45 @@ export default class TexasHoldemModel {
 
   dealCards() {
     let playerNum = this.playerBrains.length;
-    this.playerBrains.froEach((brain)=>{
-      brain.resetAction();
-    });
+    this.resetPlayersAction();
     this.board.clear();
     this.dealer.shuffleCards();
     this.currentCallValue = this.bigBlind;
     this.originalRaiserIndex = NON_EXIST_PLAYER_INDEX;
     this.utgIndex = (this.utgIndex + 1) % this.playerBrains.length;
     if (playerNum === 2) {
-      this.playerBrains[(this.utgIndex + playerNum - 1) % playerNum].action = new ActionModel(NONE, this.bigBlind);
-      this.playerBrains[this.utgIndex].action = new ActionModel(NONE, this.bigBlind/2);
+      this.playerBrains[(this.utgIndex + playerNum - 1) % playerNum].setAction(NONE, this.bigBlind);
+      this.playerBrains[this.utgIndex].setAction(NONE, this.bigBlind/2);
     } else {
-      this.playerBrains[(this.utgIndex + playerNum - 2) % playerNum].action = new ActionModel(NONE, this.bigBlind);
-      this.playerBrains[(this.utgIndex + playerNum - 1) % playerNum].action = new ActionModel(NONE, this.bigBlind/2);
+      this.playerBrains[(this.utgIndex + playerNum - 2) % playerNum].setAction(NONE, this.bigBlind);
+      this.playerBrains[(this.utgIndex + playerNum - 1) % playerNum].setAction(NONE, this.bigBlind/2);
     }
 
     // 変な配り方しているけど、ロジック部分なので。。
-    this.playerBrains.froEach((brain)=>{
+    this.playerBrains.forEach((brain)=>{
       for (let i = 0; i < HAND_CARDS_NUM; i++) {
         brain.getPlayer().setCard(this.dealer.getNextCard());
       }
+      brain.getPlayer().printStack();
+      brain.getPlayer().printHand();
     });
+    console.log('utgはid'+(this.utgIndex+1));
   }
 
   actionPhase(isPreFrop) {
     let playerNum = this.playerBrains.length,
       currentPlayerIndex;
+    this.originalRaiserIndex = NON_EXIST_PLAYER_INDEX;
+    this.currentCallValue = 0;
     if (isPreFrop) {
       this.currentActoinIndex = this.utgIndex;
+      this.currentCallValue = this.bigBlind;
     } else if (playerNum === 2) {
       this.currentActoinIndex = ((this.utgIndex + playerNum - 1) % playerNum);
     } else {
       this.currentActoinIndex = ((this.utgIndex + playerNum - 2) % playerNum);
     }
+    console.log('アクションはid'+(this.currentActoinIndex+1)+'からスタート');
     while ((currentPlayerIndex = this.searchNextPlayerIndex()) !== NON_EXIST_PLAYER_INDEX) {
       let brain = this.playerBrains[currentPlayerIndex],
         currentPlayerAction,
@@ -91,12 +99,15 @@ export default class TexasHoldemModel {
         this.currentCallValue = currentPlayerAction.value;
       }
       // BBがCHECKしたかどうか
+      // TODO: BBがCHECKしただけで次フェーズに移るようになってしまっているので直す
       if (currentPlayerIndex === ((this.utgIndex + playerNum - 1) % playerNum) && brain.getAction().name === CHECK) {
         break;
       }
       this.currentActoinIndex = (currentPlayerIndex + 1) % playerNum;
     }
     this.collectChipsToPod();
+    // コンソール表示
+    this.playerBrains.forEach((brain)=>{brain.printAction()});
     return this.isExistActivePlayer() ? NEXT : SHOWDOWN;
   }
 
@@ -105,7 +116,7 @@ export default class TexasHoldemModel {
       initialPlayerIndex = this.currentActoinIndex;
 
     for (let i = 0; i < playerNum; i++) {
-      let currentPlayerIndex = (initialPlayerIndex + i) % playerNum;
+      let currentPlayerIndex = (initialPlayerIndex + i) % playerNum,
         currentPlayerAction = this.playerBrains[currentPlayerIndex].getAction();
       // オリジナルレイザーまで回ってきたら終了
       if (currentPlayerIndex === this.originalRaiserIndex) {
@@ -123,7 +134,7 @@ export default class TexasHoldemModel {
 
   getOneSurvivor() {
     let survivors = this.playerBrains.filter((brain)=>{
-      let action = branin.getAction();
+      let action = brain.getAction();
       return action === null || action.name !== FOLD;
     });
     return (survivors.length === 1) ? survivors[0] : null;
@@ -131,7 +142,7 @@ export default class TexasHoldemModel {
 
   isExistActivePlayer() {
     return this.playerBrains.some((brain)=>{
-      let action = branin.getAction();
+      let action = brain.getAction();
       return (action === null || (action.name !== FOLD && action.name !== ALLIN));
     });
   }
@@ -186,6 +197,12 @@ export default class TexasHoldemModel {
     let pot = this.board.getPot() / winnerBrains.length;
     winnerBrains.forEach((brain)=>{
       brain.getPlayer().addStack(pod);
+    });
+  }
+
+  resetPlayersAction(){
+    this.playerBrains.forEach((brain)=>{
+      brain.resetAction();
     });
   }
 }

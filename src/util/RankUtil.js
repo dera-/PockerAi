@@ -1,4 +1,5 @@
 import {SPADE, HEART, DIAMOND, CLOVER} from '../const/CardSuit';
+import Rank from '../model/Rank';
 
 export default class RankUtil {
   static getRank(hands, boardCards) {
@@ -150,14 +151,14 @@ export default class RankUtil {
   }
 
   static getFlushRanks(cards) {
-    let suits = [SPADE:[], HEART:[], DIAMOND:[], CLOVER:[]],
+    let suits = {SPADE:[], HEART:[], DIAMOND:[], CLOVER:[]},
       sameSuitCards = [],
-      flushRanks = [],
+      flushRanks = [];
     cards.forEach((card) => {
       suits[card.suit].push(card);
     });
-    sameSuitCards = suits.filter(cards => cards.length >= 5);
-    if (sameSuitCards.lenght === 0) {
+    sameSuitCards = suits.find(cards => cards.length >= 5);
+    if (typeof sameSuitCards === 'undefined') {
       return null;
     }
     sameSuitCards = RankUtil.getSortedCards(sameSuitCards);

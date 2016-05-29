@@ -1,6 +1,6 @@
 export default class Card {
   constructor(number, suit) {
-    this.number = num;
+    this.number = number;
     this.suit = suit;
   }
 }

@@ -1,4 +1,5 @@
 import {SPADE, HEART, DIAMOND, CLOVER} from '../const/CardSuit';
+import Card from '../model/Card';
 
 export default class CardsFactory {
   generate() {
