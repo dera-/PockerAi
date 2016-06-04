@@ -1,4 +1,5 @@
 import {SPADE, HEART, DIAMOND, CLOVER} from '../const/CardSuit';
+import {ROYAL_STRAIGHT_FLUSH, STRAIGHT_FLUSH, FOUR_CARD, FULL_HOUSE, FLUSH, STRAIGHT, THREE_CARD, TWO_PAIR, ONE_PAIR, NO_PAIR} from '../const/RankStrength'
 import Rank from '../model/Rank';
 
 export default class RankUtil {
@@ -7,29 +8,44 @@ export default class RankUtil {
       rank;
     rank = RankUtil.getStraightFlushRank(cards);
     if (rank !== null) {
+      console.log('ストフラ');
+      console.log(rank);
       return rank;
     }
     rank = RankUtil.getFourCardRank(cards);
     if (rank !== null) {
+      console.log('くわっず');
+      console.log(rank);
       return rank;
     }
     rank = RankUtil.getFullHouseRank(cards);
     if (rank !== null) {
+      console.log('フルハウス');
+      console.log(rank);
       return rank;
     }
     rank = RankUtil.getFlushRank(cards);
     if (rank !== null) {
+      console.log('ふらっしゅ');
+      console.log(rank);
       return rank;
     }
     rank = RankUtil.getStraightRank(cards);
     if (rank !== null) {
+      console.log('ストレート');
+      console.log(rank);
       return rank;
     }
     rank = RankUtil.getThreeCardRank(cards);
     if (rank !== null) {
+      console.log('スリーカード');
+      console.log(rank);
       return rank;
     }
-    return RankUtil.getPairRank(cards);
+    rank = RankUtil.getPairRank(cards);
+    console.log('ペア');
+    console.log(rank);
+    return rank;
   }
 
   static getFourCardRank(cards) {
@@ -107,9 +123,9 @@ export default class RankUtil {
   }
 
   static getStraightRank(cards) {
-    let sortedCards = RankUtil.getSortedCards(cards);
-      startCardNum = sortedCards[0].number;
-      goalCardNum = startCardNum + 4;
+    let sortedCards = RankUtil.getSortedCards(cards),
+      startCardNum = sortedCards[0].number,
+      goalCardNum = startCardNum + 4,
       necessaryNumber = startCardNum+1;
     for (let i = 1; i < sortedCards.length; i++) {
       if (sortedCards[i].number === necessaryNumber) {
@@ -129,7 +145,7 @@ export default class RankUtil {
 
   static getFlushRank(cards) {
     let flushRanks = RankUtil.getFlushRanks(cards);
-    return flushRanks[flushRanks.length-1];
+    return flushRanks.length > 0 ? flushRanks[flushRanks.length-1] : null;
   }
 
   static getStraightFlushRank(cards) {
@@ -151,15 +167,24 @@ export default class RankUtil {
   }
 
   static getFlushRanks(cards) {
-    let suits = {SPADE:[], HEART:[], DIAMOND:[], CLOVER:[]},
+    let suits = {},
       sameSuitCards = [],
       flushRanks = [];
+    suits[SPADE] = [];
+    suits[HEART] = [];
+    suits[DIAMOND] = [];
+    suits[CLOVER]  = [];
     cards.forEach((card) => {
       suits[card.suit].push(card);
     });
-    sameSuitCards = suits.find(cards => cards.length >= 5);
-    if (typeof sameSuitCards === 'undefined') {
-      return null;
+    for (let suit in suits) {
+      if (suits[suit].length >= 5) {
+        sameSuitCards = suits[suit];
+        break;
+      }
+    }
+    if (sameSuitCards.length === 0) {
+      return [];
     }
     sameSuitCards = RankUtil.getSortedCards(sameSuitCards);
     for (let i = 0; i + 4 < sameSuitCards.length; i++) {
@@ -205,5 +230,9 @@ export default class RankUtil {
       }
     }
     return 0;
+  }
+
+  static getWeakestRank() {
+    return new Rank(NO_PAIR, 0, 0);
   }
 }

@@ -8,12 +8,24 @@ export default class Player {
     this.hand = [];
   }
 
+  setStack(money) {
+      this.stack = money;
+  }
+
+  hasHand() {
+    return this.hand.length > 0
+  }
+
   isAlive() {
     return this.stack > 0;
   }
 
-  setCard(card) {
-    this.hand.push(card);
+  isActive() {
+    return this.hand.length > 0 && this.stack > 0;
+  }
+
+  setCards(cards) {
+    this.hand = cards;
   }
 
   clear() {
@@ -42,5 +54,10 @@ export default class Player {
 
   printStack() {
     console.log('id'+this.id+'の残りスタック：'+this.stack);
+  }
+
+  printRank(openedCards) {
+    let rank = this.getRank(openedCards);
+    console.log('id'+this.id+'の役：'+ rank.strength);
   }
 }

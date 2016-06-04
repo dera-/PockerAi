@@ -4,6 +4,7 @@ import Board from './Board';
 import CardsFactory from '../factory/CardsFactory';
 import {ALLIN, RAISE, CALL, CHECK, FOLD, NONE} from '../const/ActionName';
 import {NEXT, END, SHOWDOWN} from '../const/GameState';
+import RankUtil from '../util/RankUtil';
 
 const HAND_CARDS_NUM = 2;
 const FROP_CARDS_NUM = 3;
@@ -17,10 +18,6 @@ export default class TexasHoldemModel {
 
     this.bigBlind = initialBigBlind;
     this.utgIndex = 0;
-
-    this.currentActoinIndex = this.utgIndex;
-    this.originalRaiserIndex = NON_EXIST_PLAYER_INDEX;
-    this.currentCallValue = initialBigBlind;
   }
 
   /**
@@ -45,8 +42,6 @@ export default class TexasHoldemModel {
     this.resetPlayersAction();
     this.board.clear();
     this.dealer.shuffleCards();
-    this.currentCallValue = this.bigBlind;
-    this.originalRaiserIndex = NON_EXIST_PLAYER_INDEX;
     this.utgIndex = (this.utgIndex + 1) % this.playerBrains.length;
     if (playerNum === 2) {
       this.playerBrains[(this.utgIndex + playerNum - 1) % playerNum].setAction(NONE, this.bigBlind);
@@ -59,7 +54,8 @@ export default class TexasHoldemModel {
     // 変な配り方しているけど、ロジック部分なので。。
     this.playerBrains.forEach((brain)=>{
       for (let i = 0; i < HAND_CARDS_NUM; i++) {
-        brain.getPlayer().setCard(this.dealer.getNextCard());
+        let cards = [this.dealer.getNextCard(), this.dealer.getNextCard()];
+        brain.getPlayer().setCards(cards);
       }
       brain.getPlayer().printStack();
       brain.getPlayer().printHand();
@@ -69,23 +65,25 @@ export default class TexasHoldemModel {
 
   actionPhase(isPreFrop) {
     let playerNum = this.playerBrains.length,
+      currentCallValue = this.bigBlind,
+      originalRaiserIndex = NON_EXIST_PLAYER_INDEX,
+      initialPlayerIndex,
       currentPlayerIndex;
-    this.originalRaiserIndex = NON_EXIST_PLAYER_INDEX;
-    this.currentCallValue = 0;
     if (isPreFrop) {
-      this.currentActoinIndex = this.utgIndex;
-      this.currentCallValue = this.bigBlind;
+      initialPlayerIndex = this.utgIndex;
+      currentCallValue = this.bigBlind;
     } else if (playerNum === 2) {
-      this.currentActoinIndex = ((this.utgIndex + playerNum - 1) % playerNum);
+      initialPlayerIndex = ((this.utgIndex + playerNum - 1) % playerNum);
     } else {
-      this.currentActoinIndex = ((this.utgIndex + playerNum - 2) % playerNum);
+      initialPlayerIndex = ((this.utgIndex + playerNum - 2) % playerNum);
     }
-    console.log('アクションはid'+(this.currentActoinIndex+1)+'からスタート');
-    while ((currentPlayerIndex = this.searchNextPlayerIndex()) !== NON_EXIST_PLAYER_INDEX) {
+    currentPlayerIndex = initialPlayerIndex;
+    console.log('アクションはid'+(currentPlayerIndex+1)+'からスタート');
+    while ((currentPlayerIndex = this.searchNextPlayerIndex(currentPlayerIndex, originalRaiserIndex, currentCallValue)) !== NON_EXIST_PLAYER_INDEX) {
       let brain = this.playerBrains[currentPlayerIndex],
         currentPlayerAction,
         survivor;
-      brain.decideAction(this.currentCallValue);
+      brain.decideAction(currentCallValue);
       // 1人以外全員フォールドしたかどうか
       survivor = this.getOneSurvivor();
       if (survivor !== null) {
@@ -94,37 +92,39 @@ export default class TexasHoldemModel {
       }
       // オリジナルレイザーが変わった場合
       currentPlayerAction = brain.getAction();
-      if (currentPlayerAction.name === RAISE || (currentPlayerAction.name === ALLIN && currentPlayerAction.value > this.currentCallValue)) {
-        this.originalRaiserIndex = currentPlayerIndex;
-        this.currentCallValue = currentPlayerAction.value;
+      if (currentPlayerAction.name === RAISE || (currentPlayerAction.name === ALLIN && currentPlayerAction.value > currentCallValue)) {
+        originalRaiserIndex = currentPlayerIndex;
+        currentCallValue = currentPlayerAction.value;
       }
-      // BBがCHECKしたかどうか
-      // TODO: BBがCHECKしただけで次フェーズに移るようになってしまっているので直す
-      if (currentPlayerIndex === ((this.utgIndex + playerNum - 1) % playerNum) && brain.getAction().name === CHECK) {
+      console.log(currentPlayerIndex+":"+brain.getAction().name);
+      // 最後までCHECKで回ったかどうか
+      if (currentPlayerIndex === ((initialPlayerIndex + playerNum - 1) % playerNum) && brain.getAction().name === CHECK) {
         break;
       }
-      this.currentActoinIndex = (currentPlayerIndex + 1) % playerNum;
+      currentPlayerIndex = (currentPlayerIndex + 1) % playerNum;
     }
     this.collectChipsToPod();
     // コンソール表示
     this.playerBrains.forEach((brain)=>{brain.printAction()});
-    return this.isExistActivePlayer() ? NEXT : SHOWDOWN;
+    return this.isExistMultiActivePlayers() ? NEXT : SHOWDOWN;
   }
 
-  searchNextPlayerIndex() {
-    let playerNum = this.playerBrains.length,
-      initialPlayerIndex = this.currentActoinIndex;
-
+  searchNextPlayerIndex(initialPlayerIndex, originalRaiserIndex, currentCallValue) {
+    let playerNum = this.playerBrains.length;
     for (let i = 0; i < playerNum; i++) {
       let currentPlayerIndex = (initialPlayerIndex + i) % playerNum,
-        currentPlayerAction = this.playerBrains[currentPlayerIndex].getAction();
+        currentPlayerAction = this.playerBrains[currentPlayerIndex].getAction(),
+        player = this.playerBrains[currentPlayerIndex].getPlayer();
       // オリジナルレイザーまで回ってきたら終了
-      if (currentPlayerIndex === this.originalRaiserIndex) {
+      if (currentPlayerIndex === originalRaiserIndex) {
         return NON_EXIST_PLAYER_INDEX;
       }
+      if (false === player.isActive()) {
+        continue;
+      }
       if (
-        currentPlayerAction == null ||
-        (currentPlayerAction.name !== ALLIN && currentPlayerAction.name !== FOLD)
+        currentPlayerAction === null || currentPlayerAction.name === NONE ||
+        (currentPlayerAction.name !== ALLIN && currentPlayerAction.name !== FOLD && currentPlayerAction.value < currentCallValue)
       ) {
         return currentPlayerIndex;
       }
@@ -140,11 +140,12 @@ export default class TexasHoldemModel {
     return (survivors.length === 1) ? survivors[0] : null;
   }
 
-  isExistActivePlayer() {
-    return this.playerBrains.some((brain)=>{
+  isExistMultiActivePlayers() {
+    let players = this.playerBrains.filter((brain)=>{
       let action = brain.getAction();
       return (action === null || (action.name !== FOLD && action.name !== ALLIN));
     });
+    return players.length >= 2;
   }
 
   collectChipsToPod() {
@@ -177,12 +178,17 @@ export default class TexasHoldemModel {
   }
 
   getWinners() {
-    let boardCards = this.board.getOpenedCards();
-      bestRank = new Rank(NO_PAIR, 0, 0),
+    let boardCards = this.board.getOpenedCards(),
+      bestRank = RankUtil.getWeakestRank(),
+      candidates = this.playerBrains.filter(brain => brain.getPlayer().hasHand()),
       winners = [];
-    this.playerBrains.forEach((brain)=>{
-      let rank = brain.getPlayer().getRank(boardCards),
-        comparedResult = RankUtil.compareRanks(rank, bestRank);
+    candidates.forEach((brain)=>{
+      let rank = brain.getPlayer().getRank(boardCards);
+      console.log(brain.getPlayer());
+      console.log(boardCards);
+      console.log(rank);
+      let comparedResult = RankUtil.compareRanks(rank, bestRank);
+      brain.getPlayer().printRank(boardCards); //TODO デバッグ用なので後で消す
       if (comparedResult === 1) {
         bestRank = rank;
         winners = [brain];
@@ -196,7 +202,7 @@ export default class TexasHoldemModel {
   sharePodToWinners(winnerBrains) {
     let pot = this.board.getPot() / winnerBrains.length;
     winnerBrains.forEach((brain)=>{
-      brain.getPlayer().addStack(pod);
+      brain.getPlayer().addStack(pot);
     });
   }
 

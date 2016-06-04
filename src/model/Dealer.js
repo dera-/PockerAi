@@ -7,8 +7,14 @@ export default class Dealer {
 
   shuffleCards() {
     this.index = 0;
-    let random = this.cards.map(Math.random);
-    this.cards.sort((a,b) => random[a] - random[b]);
+    let shuffledCards = [],
+        cloneCards = [].concat(this.cards);
+    while (cloneCards.length > 0) {
+        let index = Math.floor(Math.random() * cloneCards.length);
+        shuffledCards.push(cloneCards[index]);
+        cloneCards.splice(index, 1);
+    }
+    this.cards = shuffledCards;
   }
 
   getNextCard() {

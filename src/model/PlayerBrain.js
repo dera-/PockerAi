@@ -15,7 +15,9 @@ export default class PlayerBrain {
   // テストとしてエニハンコールマンを実装
   // TODO: ここの処理をちゃんと実装する
   decideAction(callValue) {
-    if (callValue === 0 || this.action.value === callValue) {
+    if (this.action === null) {
+      this.action = new ActionModel(CHECK, 0);
+    } else if (this.action.value === callValue) {
       this.action = new ActionModel(CHECK, callValue);
     } else {
       this.action = new ActionModel(CALL, callValue);

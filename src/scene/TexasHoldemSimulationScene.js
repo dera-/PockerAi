@@ -12,9 +12,9 @@ export default class TexasHoldemSimulationScene {
   }
 
   run() {
-    let players = [new PlayerBrain(new Player(1, this.initialStack)), new PlayerBrain(new Player(2, this.initialStack))],
-      gameModel = new TexasHoldemModel(players, this.bigBlind);
     for (let num = 0; num < this.similationTimes; num++) {
+      let players = [new PlayerBrain(new Player(1, this.initialStack)), new PlayerBrain(new Player(2, this.initialStack))],
+        gameModel = new TexasHoldemModel(players, this.bigBlind);
       console.log("game"+num+'開始');
       this.oneGame(gameModel);
       console.log("game"+num+'完了');
