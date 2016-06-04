@@ -3,9 +3,9 @@ const GAMMA_VALUE = 0.9; //割引値(0.9が普通)
 const LAMBDA_VALUE = 0.95;  //減衰率
 
 export default class QValue {
-  constructor(state, action, score = 0) {
-    this.state = state;
-    this.action = action;
+  constructor(stateId, actionId, score = 0) {
+    this.stateId = stateId;
+    this.actionId = actionId;
     this.score = score;
   }
 

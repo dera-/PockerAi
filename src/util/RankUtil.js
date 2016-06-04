@@ -1,5 +1,5 @@
 import {SPADE, HEART, DIAMOND, CLOVER} from '../const/CardSuit';
-import {ROYAL_STRAIGHT_FLUSH, STRAIGHT_FLUSH, FOUR_CARD, FULL_HOUSE, FLUSH, STRAIGHT, THREE_CARD, TWO_PAIR, ONE_PAIR, NO_PAIR} from '../const/RankStrength'
+import {ROYAL_STRAIGHT_FLUSH, STRAIGHT_FLUSH, FOUR_CARD, FULL_HOUSE, FLUSH, STRAIGHT, THREE_CARD, TWO_PAIR, ONE_PAIR, NO_PAIR, STRONG_RANG, HIGH_THREE_CARD, MIDDLE_THREE_CARD, LOW_THREE_CARD, HIGH_TWO_PAIR, MIDDLE_TWO_PAIR, LOW_TWO_PAIR, ONE_PAIR_A, ONE_PAIR_K, ONE_PAIR_Q, ONE_PAIR_J, ONE_PAIR_MIDDLE, ONE_PAIR_LOW, NO_PAIR_A, NO_PAIR_K, NO_PAIR_Q, NO_PAIR_J, NO_PAIR_MIDDLE, NO_PAIR_LOW} from '../const/RankStrength'
 import Rank from '../model/Rank';
 
 export default class RankUtil {
@@ -122,11 +122,11 @@ export default class RankUtil {
     return new Rank(NO_PAIR, 0, 0, others);
   }
 
-  static getStraightRank(cards) {
+  static getStraightRank(cards, necessaryCardNum = 5) {
     let sortedCards = RankUtil.getSortedCards(cards),
       startCardNum = sortedCards[0].number,
-      goalCardNum = startCardNum + 4,
-      necessaryNumber = startCardNum+1;
+      goalCardNum = startCardNum + necessaryCardNum - 1,
+      necessaryNumber = startCardNum + 1;
     for (let i = 1; i < sortedCards.length; i++) {
       if (sortedCards[i].number === necessaryNumber) {
         necessaryNumber++;
@@ -136,8 +136,8 @@ export default class RankUtil {
         break;
       }
     }
-    if (necessaryNumber-1 >= goalCardNum) {
-      return new Rank(STRAIGHT, necessaryNumber-1, necessaryNumber-5);
+    if (necessaryNumber - 1 >= goalCardNum) {
+      return new Rank(STRAIGHT, necessaryNumber - 1, necessaryNumber - necessaryCardNum);
     } else {
       return null;
     }
@@ -166,7 +166,18 @@ export default class RankUtil {
     return null;
   }
 
-  static getFlushRanks(cards) {
+  static isFlushDraw(hands, boardCards) {
+    let cards = hands.concat(boardCards),
+      flushDrawRanks = RankUtil.getFlushRanks(cards, 4);
+    return flushDrawRanks.length > 0;
+  }
+
+  static isStraightDraw(hands, boardCards) {
+    let cards = hands.concat(boardCards);
+    return RankUtil.getStraightRank(cards, 4) !== null;
+  }
+
+  static getFlushRanks(cards, necessaryCardNum = 5) {
     let suits = {},
       sameSuitCards = [],
       flushRanks = [];
@@ -178,7 +189,7 @@ export default class RankUtil {
       suits[card.suit].push(card);
     });
     for (let suit in suits) {
-      if (suits[suit].length >= 5) {
+      if (suits[suit].length >= necessaryCardNum) {
         sameSuitCards = suits[suit];
         break;
       }
@@ -187,8 +198,8 @@ export default class RankUtil {
       return [];
     }
     sameSuitCards = RankUtil.getSortedCards(sameSuitCards);
-    for (let i = 0; i + 4 < sameSuitCards.length; i++) {
-      flushRanks.push(new Rank(FLUSH, sameSuitCards[i+4].number, sameSuitCards[i].number));
+    for (let i = 0; i + necessaryCardNum - 1 < sameSuitCards.length; i++) {
+      flushRanks.push(new Rank(FLUSH, sameSuitCards[i + necessaryCardNum - 1].number, sameSuitCards[i].number));
     }
     return flushRanks;
   }
@@ -234,5 +245,60 @@ export default class RankUtil {
 
   static getWeakestRank() {
     return new Rank(NO_PAIR, 0, 0);
+  }
+
+  static getRealRank(hands, board) {
+    let rank = RankUtil.getRank(hands, board),
+      highCardThreshold = 12,
+      middleCardThreshold = 7;
+    if (rank.strength >= FOUR_CARD) {
+      return STRONG_RANK;
+    } else if (rank.strength >= STRAIGHT) {
+      return rank.strength;
+    } else if (rank.strength === THREE_CARD) {
+      if (rank.top >= highCardThreshold) {
+        return HIGH_THREE_CARD;
+      } else if (rank.top >= middleCardThreshold) {
+        return MIDDLE_THREE_CARD;
+      } else {
+        return LOW_THREE_CARD;
+      }
+    } else if (rank.strength === TWO_PAIR) {
+      if (rank.top >= highCardThreshold) {
+        return HIGH_TWO_PAIR;
+      } else if (rank.top >= middleCardThreshold) {
+        return MIDDLE_TWO_PAIR;
+      } else {
+        return LOW_TWO_PAIR;
+      }
+    } else if (rank.strength === ONE_PAIR) {
+      if (rank.top === 14) {
+        return ONE_PAIR_A;
+      } else if (rank.top === 13) {
+        return ONE_PAIR_K;
+      } else if (rank.top === 12) {
+        return ONE_PAIR_Q;
+      } else if (rank.top === 11) {
+        return ONE_PAIR_J;
+      } else if (rank.top >= middleCardThreshold) {
+        return ONE_PAIR_MIDDLE;
+      } else {
+        return ONE_PAIR_LOW;
+      }
+    } else {
+      if (rank.kickers[0] === 14) {
+        return NO_PAIR_A;
+      } else if (rank.kickers[0] === 13) {
+        return NO_PAIR_K;
+      } else if (rank.kickers[0] === 12) {
+        return NO_PAIR_Q;
+      } else if (rank.kickers[0] === 11) {
+        return NO_PAIR_J;
+      } else if (rank.kickers[0] >= middleCardThreshold) {
+        return NO_PAIR_MIDDLE;
+      } else {
+        return NO_PAIR_LOW;
+      }
+    }
   }
 }
