@@ -64,6 +64,14 @@ export default class Board {
     return pots[0];
   }
 
+  getPotValue() {
+    let totalValue = 0;
+    this.chipPots.forEach((pot) => {
+      totalValue += pot.chip;
+    });
+    return totalValue;
+  }
+
   clear() {
     this.openedCards = [];
     this.chipPots = [];

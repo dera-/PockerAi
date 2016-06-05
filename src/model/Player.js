@@ -48,6 +48,10 @@ export default class Player {
     return RankUtil.getRank(this.hand, openedCards);
   }
 
+  getHand() {
+    return this.hand;
+  }
+
   printHand() {
     console.log('id'+this.id+'のハンド：'+this.hand[0].number+this.hand[0].suit+','+this.hand[1].number+this.hand[1].suit);
   }

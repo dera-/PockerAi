@@ -65,7 +65,7 @@ export default class TexasHoldemModel {
 
   actionPhase(isPreFrop) {
     let playerNum = this.playerBrains.length,
-      currentCallValue = this.bigBlind,
+      currentCallValue = 0,
       originalRaiserIndex = NON_EXIST_PLAYER_INDEX,
       initialPlayerIndex,
       currentPlayerIndex;

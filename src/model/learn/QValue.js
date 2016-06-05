@@ -29,7 +29,7 @@ export default class QValue {
     return comp + GAMMA_VALUE * next - this.score;
   }
 
-  static getGammaValue() {
-    return GAMMA_VALUE;
+  static getLambdaValue() {
+    return LAMBDA_VALUE;
   }
 }

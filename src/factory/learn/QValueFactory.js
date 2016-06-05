@@ -4,21 +4,23 @@ import MachineOpenedBoardState from '../../model/learn/MachineOpenedBoardState';
 import MachinePreFlopState from '../../model/learn/MachinePreFlopState';
 
 export default class QvalueFactory {
-  generateListForPreFlopState() {
-    return QvalueFactory.generateList(MachinePreFlopState.getStatesCount(), MachineAction.getActionsCount());
+  generateMapForPreFlopState() {
+    return QvalueFactory.generateMap(MachinePreFlopState.getStatesCount(), MachineAction.getActionsCount());
   }
 
-  generateListForOpenedBoardState() {
-    return QvalueFactory.generateList(MachineOpenedBoardState.getStatesCount(), MachineAction.getActionsCount());
+  generateMapForOpenedBoardState() {
+    return QvalueFactory.generateMap(MachineOpenedBoardState.getStatesCount(), MachineAction.getActionsCount());
   }
 
   generateList(statesCount, actionsCount) {
-    let qValues = [];
+    let qValueMap = new Map();
     for (let stateId = 1; stateId <= statesCount; stateId++) {
+      let qValues = [];
       for (let actionId = 1; actionId <= actionsCount; actionId++) {
         qValues.push(new QValue(stateId, actionId));
       }
+      qValueMap.set(stateId, qValues);
     }
-    return qValues;
+    return qValueMap;
   }
 }

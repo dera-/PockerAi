@@ -1,4 +1,5 @@
 import {ALLIN, RAISE, CALL, CHECK, FOLD}  from '../../const/ActionName';
+import {ALLIN_NUM, BIG_RAISE_NUM, MIDDLE_RAISE_NUM, SMALL_RAISE_NUM, CALL_NUM, CHECK_NUM, FOLD_NUM} from '../../const/MachineActionNumber';
 
 const WEAK = -1;
 const MEDIUM = 0;
@@ -14,14 +15,19 @@ export default class MachineAction {
 
   static generateAllActions() {
     let actions = [];
-    actions.push(new MachineAction(1, ALLIN));
-    actions.push(new MachineAction(2, RAISE, WEAK));
-    actions.push(new MachineAction(3, RAISE, MEDIUM));
-    actions.push(new MachineAction(4, RAISE, STRONG));
-    actions.push(new MachineAction(5, CALL));
-    actions.push(new MachineAction(6, CHECK));
-    actions.push(new MachineAction(7, FOLD));
+    actions.push(new MachineAction(ALLIN_NUM, ALLIN));
+    actions.push(new MachineAction(BIG_RAISE_NUM, RAISE, STRONG));
+    actions.push(new MachineAction(MIDDLE_RAISE_NUM, RAISE, MEDIUM));
+    actions.push(new MachineAction(SMALL_RAISE_NUM, RAISE, WEAK));
+    actions.push(new MachineAction(CALL_NUM, CALL));
+    actions.push(new MachineAction(CHECK_NUM, CHECK));
+    actions.push(new MachineAction(FOLD_NUM, FOLD));
     return actions;
+  }
+
+  static getMachineAction(id) {
+      let selected = ALL_MACHINE_ACTIONS.filter(action => id === action.id);
+      return selected[0];
   }
 
   static getActionsCount() {
