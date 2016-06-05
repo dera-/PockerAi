@@ -45,6 +45,6 @@ export default class BoardUtil {
   }
 
   static getExistsType(board) {
-    return board.getOpenedCards().some(card => card.number === 14) ? EXIST_ACE : 0;
+    return board.some(card => card.number === 14) ? EXIST_ACE : 0;
   }
 }

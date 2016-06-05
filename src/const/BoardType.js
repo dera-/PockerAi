@@ -32,7 +32,6 @@ export const EXIST_ACE = 10000;
 export const ALL_EXISTS = [NONE, EXIST_ACE];
 
 // TODO: 流石にやばいので修正
-export const ALL_BOARD_PATTERNS = getAllBoardPatterns();
 let getAllBoardPatterns = () => {
   let patterns = [];
   for (let a of ALL_SAME_SUITES) {
@@ -48,3 +47,4 @@ let getAllBoardPatterns = () => {
   }
   return patterns;
 };
+export const ALL_BOARD_PATTERNS = getAllBoardPatterns();

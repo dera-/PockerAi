@@ -58,8 +58,8 @@ export default class TexasHoldemModel {
         let cards = [this.dealer.getNextCard(), this.dealer.getNextCard()];
         brain.getPlayer().setCards(cards);
       }
-      brain.getPlayer().printStack();
-      brain.getPlayer().printHand();
+      //brain.getPlayer().printStack();
+      //brain.getPlayer().printHand();
     });
     console.log('utgはid'+(this.utgIndex+1));
   }
@@ -106,7 +106,7 @@ export default class TexasHoldemModel {
     }
     this.collectChipsToPod();
     // コンソール表示
-    this.playerBrains.forEach((brain)=>{brain.printAction()});
+    //this.playerBrains.forEach((brain)=>{brain.printAction()});
     return this.isExistMultiActivePlayers() ? NEXT : SHOWDOWN;
   }
 
@@ -183,11 +183,11 @@ export default class TexasHoldemModel {
       bestRank = RankUtil.getWeakestRank(),
       candidates = this.playerBrains.filter(brain => brain.getPlayer().hasHand()),
       winners = [];
-    console.log(boardCards);
+    //console.log(boardCards);
     candidates.forEach((brain)=>{
       let rank = brain.getPlayer().getRank(boardCards);
-      console.log(brain.getPlayer());
-      console.log(rank);
+      //console.log(brain.getPlayer());
+      //console.log(rank);
       let comparedResult = RankUtil.compareRanks(rank, bestRank);
       if (comparedResult === 1) {
         bestRank = rank;
@@ -204,7 +204,6 @@ export default class TexasHoldemModel {
   }
 
   sharePodToWinners(winnerBrains) {
-    console.log('sharePodToWinners');
     let ids = winnerBrains.map(brain => brain.getPlayer().id),
       pots;
     if (winnerBrains.length === 1) {
@@ -213,7 +212,7 @@ export default class TexasHoldemModel {
       pots = this.board.getPotForMulti(ids);
     }
     pots.forEach((pot) => {
-      console.log(pot);
+      //console.log(pot);
       this.getPlayer(pot.id).addStack(pot.chip);
     });
   }

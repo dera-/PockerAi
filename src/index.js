@@ -1,4 +1,4 @@
 import TexasHoldemSimulationScene from './scene/TexasHoldemSimulationScene';
 
-let scene = new TexasHoldemSimulationScene(2, 50, 100);
+let scene = new TexasHoldemSimulationScene(20, 50, 500);
 scene.run();

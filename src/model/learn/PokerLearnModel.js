@@ -28,7 +28,7 @@ export default class PokerLearnModel {
 
   updateQValues(chip, isLoose) {
     let value = this.getResultValue(chip, isLoose),
-      lambdaValue = QValue.getLambdaValue();
+      lambdaValue = QValue.getLambdaValue(),
       valueForTurn = value * Math.pow(lambdaValue, this.riverActionHistory.length),
       valueForFrop = value * Math.pow(lambdaValue, this.riverActionHistory.length + this.turnActionHistory.length),
       valueForPreFlop = value * Math.pow(lambdaValue, this.riverActionHistory.length + this.turnActionHistory.length + this.flopActionHistory.length);
@@ -99,30 +99,30 @@ export default class PokerLearnModel {
       case PRE_FLOP:
         stateId = MachinePreFlopState.getId(myHand, myStack, enemyStack, myActionName, enemyActionName);
         qvalues = this.preFlopQValueMap.get(stateId);
-        qvalue = this.getQValue(qvalues);
+        qvalue = this.getQValue(qvalues, callValue, ActionUtil.getNoBetValue(myAction));
         this.preFlopActionHistory.push(qvalue);
         break;
       case FLOP:
-        stateId = MachineOpenedBoardState.getId(myHand, boardCards, myStack, enemyStack, myAction, enemyAction);
+        stateId = MachineOpenedBoardState.getId(myHand, boardCards, myStack, enemyStack, myActionName, enemyActionName);
         qvalues = this.flopQValueMap.get(stateId);
-        qvalue = this.getQValue(qvalues);
+        qvalue = this.getQValue(qvalues, callValue, ActionUtil.getNoBetValue(myAction));
         this.flopActionHistory.push(qvalue)
         break;
       case TURN:
-        stateId = MachineOpenedBoardState.getId(myHand, boardCards, myStack, enemyStack, myAction, enemyAction);
+        stateId = MachineOpenedBoardState.getId(myHand, boardCards, myStack, enemyStack, myActionName, enemyActionName);
         qvalues = this.turnQValueMap.get(stateId);
-        qvalue = this.getQValue(qvalues);
+        qvalue = this.getQValue(qvalues, callValue, ActionUtil.getNoBetValue(myAction));
         this.turnActionHistory.push(qvalue);
         break;
       case RIVER:
-        stateId = MachineOpenedBoardState.getId(myHand, boardCards, myStack, enemyStack, myAction, enemyAction);
+        stateId = MachineOpenedBoardState.getId(myHand, boardCards, myStack, enemyStack, myActionName, enemyActionName);
         qvalues = this.riverQValueMap.get(stateId);
-        qvalue = this.getQValue(qvalues);
+        qvalue = this.getQValue(qvalues, callValue, ActionUtil.getNoBetValue(myAction));
         this.riverActionHistory.push(qvalue);
         break;
     }
     machineAction = MachineAction.getMachineAction(qvalue.actionId);
-    return this.getActualAction(machineAction, actionPhase, board.getPotValue(), callValue, myAction);
+    return this.getActualAction(machineAction, actionPhase, board.getPotValue(), callValue, playerBrain);
   }
 
   getActualAction(machineAction, actionPhase, potValue, callValue, playerBrain) {
@@ -146,13 +146,18 @@ export default class PokerLearnModel {
     }
   }
 
-  getQValue(qvalues) {
+  getQValue(qvalues, callValue, currentBetValue) {
     let candidates = qvalues.filter((qvalue) => {
+      let isPossibleAction;
       if (callValue === 0) {
-        return qvalue.actionId !== CALL_NUM;
+        isPossibleAction = qvalue.actionId !== CALL_NUM;
       } else {
-        return qvalue.actionId !== CHECK_NUM;
+        isPossibleAction = qvalue.actionId !== CHECK_NUM;
       }
+      if (callValue === currentBetValue) {
+        isPossibleAction = isPossibleAction && qvalue.actionId !== FOLD_NUM
+      }
+      return isPossibleAction;
     }),
       probabilities = this.getQValueProbabilities(candidates),
       random = Math.random(),
@@ -167,7 +172,7 @@ export default class PokerLearnModel {
     return null;
   }
 
-  getQValueProbabilities(qvalues){
+  getQValueProbabilities(qvalues) {
     let probabilities = [],
       temp = 0.20,  //逆温度(0に近い程グリーディ)
       all = 0;
@@ -182,7 +187,7 @@ export default class PokerLearnModel {
       }
     } else {
       for (let qvalue of qvalues) {
-        probabilities.push((qvalue.getScore() / temp) / all);  //逆温度を使用
+        probabilities.push(Math.exp(qvalue.getScore() / temp) / all);  //逆温度を使用
       }
     }
     return probabilities;

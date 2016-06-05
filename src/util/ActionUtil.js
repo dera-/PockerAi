@@ -1,5 +1,5 @@
 import ActionModel from '../model/ActionModel';
-import {BIG_RAISE_NUM, MIDDLE_RAISE_NUM, SMALL_RAISE_NUM} from '../../const/MachineActionNumber';
+import {BIG_RAISE_NUM, MIDDLE_RAISE_NUM, SMALL_RAISE_NUM} from '../const/MachineActionNumber';
 
 export default class ActionUtil {
   static getNoBetValue(action) {
@@ -19,11 +19,11 @@ export default class ActionUtil {
       middleRaiseValue = 3 * callValue;
       smallRaiseValue = 2 * callValue;
     }
-    if (machineAction.id === BIG_RAISE_NUM) {
+    if (machineActionNum === BIG_RAISE_NUM) {
       return bigRaiseValue;
-    } else if (machineAction.id === MIDDLE_RAISE_NUM) {
+    } else if (machineActionNum === MIDDLE_RAISE_NUM) {
       return middleRaiseValue;
-    } else if (machineAction.id === SMALL_RAISE_NUM) {
+    } else if (machineActionNum === SMALL_RAISE_NUM) {
       return smallRaiseValue;
     }
     return 0;

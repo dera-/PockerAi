@@ -5,14 +5,14 @@ import MachinePreFlopState from '../../model/learn/MachinePreFlopState';
 
 export default class QvalueFactory {
   generateMapForPreFlopState() {
-    return QvalueFactory.generateMap(MachinePreFlopState.getStatesCount(), MachineAction.getActionsCount());
+    return this.generateMap(MachinePreFlopState.getStatesCount(), MachineAction.getActionsCount());
   }
 
   generateMapForOpenedBoardState() {
-    return QvalueFactory.generateMap(MachineOpenedBoardState.getStatesCount(), MachineAction.getActionsCount());
+    return this.generateMap(MachineOpenedBoardState.getStatesCount(), MachineAction.getActionsCount());
   }
 
-  generateList(statesCount, actionsCount) {
+  generateMap(statesCount, actionsCount) {
     let qValueMap = new Map();
     for (let stateId = 1; stateId <= statesCount; stateId++) {
       let qValues = [];

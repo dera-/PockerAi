@@ -1,4 +1,5 @@
 import Player from './Player';
+import PlayerBrain from './PlayerBrain';
 import ActionModel from './ActionModel';
 import {ALLIN, RAISE, CALL, CHECK, FOLD} from '../const/ActionName';
 

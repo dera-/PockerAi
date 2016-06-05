@@ -4,7 +4,6 @@ import {ALLIN_NUM, BIG_RAISE_NUM, MIDDLE_RAISE_NUM, SMALL_RAISE_NUM, CALL_NUM, C
 const WEAK = -1;
 const MEDIUM = 0;
 const STRONG = 1;
-const ALL_MACHINE_ACTIONS = MachineAction.generateAllActions();
 
 export default class MachineAction {
   constructor(id, actionName, strength = 0) {
@@ -34,3 +33,5 @@ export default class MachineAction {
     return ALL_MACHINE_ACTIONS.length;
   }
 }
+
+const ALL_MACHINE_ACTIONS = MachineAction.generateAllActions();

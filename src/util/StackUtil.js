@@ -1,4 +1,4 @@
-import {VERY_LARGE, LARGE, EVEN, SHORT, VERY_SHORT} from '../const/StackSize';
+import {VERY_LARGE, LARGE, EVEN, SHORT, VERY_SHORT} from '../const/StackSizeType';
 
 const THRESHOLD = 2;
 const BIG_THRESHOLD = 5;

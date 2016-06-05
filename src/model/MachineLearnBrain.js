@@ -1,3 +1,4 @@
+import PlayerBrain from './PlayerBrain';
 import PokerLearnModel from './learn/PokerLearnModel';
 
 export default class MachineLearnBrain extends PlayerBrain {
