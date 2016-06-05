@@ -10,4 +10,14 @@ export default class MachineLearnBrain extends PlayerBrain {
   decideAction(actionPhase, enemyBrain, board, callValue) {
     this.action = this.pokerLearnModel.getAction(actionPhase, this, enemyBrain, board, callValue);
   }
+
+  learn(chip, isLoose) {
+    this.pokerLearnModel.updateQValues(chip, isLoose);
+    this.pokerLearnModel.deleteHistories();
+  }
+
+  learnWhenFold(actionPhase, chip, isLoose) {
+    this.pokerLearnModel.updateQValue(actionPhase, chip, isLoose);
+    this.pokerLearnModel.deleteHistories();
+  }
 }

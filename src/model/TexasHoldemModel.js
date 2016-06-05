@@ -4,6 +4,7 @@ import Board from './Board';
 import CardsFactory from '../factory/CardsFactory';
 import {ALLIN, RAISE, CALL, CHECK, FOLD, NONE} from '../const/ActionName';
 import {NEXT, END, SHOWDOWN} from '../const/GameState';
+import {PRE_FLOP, FLOP, TURN, RIVER} from '../const/ActionPhase';
 import RankUtil from '../util/RankUtil';
 
 const HAND_CARDS_NUM = 2;
@@ -32,7 +33,7 @@ export default class TexasHoldemModel {
    * TODO: ヘッズアップならこれでいいけど、３人以上のゲームだと次にアクションが始まる位置がおかしなことになるので要修正
    */
   deleteDeadPlayer() {
-    this.playerBrains = this.playerBrains.filter((brain)=>{
+    this.playerBrains = this.playerBrains.filter((brain) => {
       return brain.getPlayer().isAlive();
     });
   }
@@ -63,13 +64,13 @@ export default class TexasHoldemModel {
     console.log('utgはid'+(this.utgIndex+1));
   }
 
-  actionPhase(isPreFrop) {
+  actionPhase(actionPhase) {
     let playerNum = this.playerBrains.length,
       currentCallValue = 0,
       originalRaiserIndex = NON_EXIST_PLAYER_INDEX,
       initialPlayerIndex,
       currentPlayerIndex;
-    if (isPreFrop) {
+    if (actionPhase === PRE_FLOP) {
       initialPlayerIndex = this.utgIndex;
       currentCallValue = this.bigBlind;
     } else if (playerNum === 2) {
@@ -83,7 +84,7 @@ export default class TexasHoldemModel {
       let brain = this.playerBrains[currentPlayerIndex],
         currentPlayerAction,
         survivor;
-      brain.decideAction(currentCallValue);
+      brain.decideAction(actionPhase, this.playerBrains[(currentPlayerIndex + 1) % playerNum], this.board, currentCallValue);
       // 1人以外全員フォールドしたかどうか
       survivor = this.getOneSurvivor();
       if (survivor !== null) {
@@ -196,6 +197,10 @@ export default class TexasHoldemModel {
       }
     });
     return winners;
+  }
+
+  getChipsInPod() {
+    return this.board.getPotValue();
   }
 
   sharePodToWinners(winnerBrains) {
