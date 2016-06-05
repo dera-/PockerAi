@@ -43,8 +43,12 @@ export default class TexasHoldemSimulationScene {
       gameState = NEXT,
       winners,
       playerAction,
-      isWin;
+      isWin,
+      playerHand,
+      enemyHand;
     gameModel.dealCards();
+    playerHand = this.players[0].getPlayer().getHand();
+    enemyHand = this.players[1].getPlayer().getHand();
     for (currentPhase = PRE_FLOP; currentPhase <= RIVER; currentPhase++) {
       if (currentPhase === FLOP) {
         gameModel.startFrop();
@@ -64,6 +68,7 @@ export default class TexasHoldemSimulationScene {
     isWin = winners.some(brain => this.playerId === brain.getPlayer().id);
     // ここで学習
     if (gameState === END && playerAction.name === FOLD) {
+      isWin = gameModel.isWin(playerHand, enemyHand);
       this.players[0].learnWhenFold(currentPhase, gameModel.getChipsInPod(), !isWin);
     } else {
       this.players[0].learn(gameModel.getChipsInPod(), !isWin);

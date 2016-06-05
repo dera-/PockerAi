@@ -9,8 +9,8 @@ import {ALLIN_NUM, BIG_RAISE_NUM, MIDDLE_RAISE_NUM, SMALL_RAISE_NUM, CALL_NUM, C
 import ActionModel from '../ActionModel';
 import ActionUtil from '../../util/ActionUtil';
 
-const REWARD = 50;
-const PENALTY = -200;
+const REWARD = 10;
+const PENALTY = -10;
 
 export default class PokerLearnModel {
   constructor(initialStack) {
@@ -101,25 +101,25 @@ export default class PokerLearnModel {
         stateId = MachinePreFlopState.getId(myHand, myStack, enemyStack, myActionName, enemyActionName);
         qvalues = this.preFlopQValueMap.get(stateId);
         qvalue = this.getQValue(qvalues, callValue, ActionUtil.getNoBetValue(myAction));
-        this.preFlopActionHistory.push(qvalue);
+        this.preFlopActionHistory.unshift(qvalue);
         break;
       case FLOP:
         stateId = MachineOpenedBoardState.getId(myHand, boardCards, myStack, enemyStack, myActionName, enemyActionName);
         qvalues = this.flopQValueMap.get(stateId);
         qvalue = this.getQValue(qvalues, callValue, ActionUtil.getNoBetValue(myAction));
-        this.flopActionHistory.push(qvalue)
+        this.flopActionHistory.unshift(qvalue)
         break;
       case TURN:
         stateId = MachineOpenedBoardState.getId(myHand, boardCards, myStack, enemyStack, myActionName, enemyActionName);
         qvalues = this.turnQValueMap.get(stateId);
         qvalue = this.getQValue(qvalues, callValue, ActionUtil.getNoBetValue(myAction));
-        this.turnActionHistory.push(qvalue);
+        this.turnActionHistory.unshift(qvalue);
         break;
       case RIVER:
         stateId = MachineOpenedBoardState.getId(myHand, boardCards, myStack, enemyStack, myActionName, enemyActionName);
         qvalues = this.riverQValueMap.get(stateId);
         qvalue = this.getQValue(qvalues, callValue, ActionUtil.getNoBetValue(myAction));
-        this.riverActionHistory.push(qvalue);
+        this.riverActionHistory.unshift(qvalue);
         break;
     }
     //console.log(qvalue);

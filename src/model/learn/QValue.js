@@ -1,6 +1,6 @@
 const ALPHA_VALUE = 0.1; //学習率(0.1が普通)
 const GAMMA_VALUE = 0.9; //割引値(0.9が普通)
-const LAMBDA_VALUE = 0.8;  //減衰率
+const LAMBDA_VALUE = 0.5;  //減衰率
 
 export default class QValue {
   constructor(stateId, actionId, score = 0) {

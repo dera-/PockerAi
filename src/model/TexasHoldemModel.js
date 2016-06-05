@@ -158,7 +158,7 @@ export default class TexasHoldemModel {
         value = action === null ? 0 : action.value;
       this.board.addChip(player.id, value);
       player.pay(value);
-      if (action.name === FOLD) {
+      if (action !== null && action.name === FOLD) {
         player.clear();
       }
     });
@@ -229,5 +229,10 @@ export default class TexasHoldemModel {
     this.playerBrains.forEach((brain) => {
       brain.resetAction();
     });
+  }
+
+  isWin(playerHand, targetHand) {
+    let boardCards = this.board.getOpenedCards();
+    return RankUtil.compareRanks(RankUtil.getRank(playerHand, boardCards), RankUtil.getRank(targetHand, boardCards)) !== -1;
   }
 }
