@@ -38,6 +38,10 @@ export default class TexasHoldemModel {
     });
   }
 
+  isExistPlayer(id) {
+    return this.playerBrains.some(brain => id === brain.getPlayer().id);
+  }
+
   dealCards() {
     let playerNum = this.playerBrains.length;
     this.resetPlayersAction();
@@ -61,7 +65,6 @@ export default class TexasHoldemModel {
       //brain.getPlayer().printStack();
       //brain.getPlayer().printHand();
     });
-    console.log('utgはid'+(this.utgIndex+1));
   }
 
   actionPhase(actionPhase) {
@@ -79,7 +82,6 @@ export default class TexasHoldemModel {
       initialPlayerIndex = ((this.utgIndex + playerNum - 2) % playerNum);
     }
     currentPlayerIndex = initialPlayerIndex;
-    console.log('アクションはid'+(currentPlayerIndex+1)+'からスタート');
     while ((currentPlayerIndex = this.searchNextPlayerIndex(currentPlayerIndex, originalRaiserIndex, currentCallValue)) !== NON_EXIST_PLAYER_INDEX) {
       let brain = this.playerBrains[currentPlayerIndex],
         currentPlayerAction,
@@ -97,7 +99,7 @@ export default class TexasHoldemModel {
         originalRaiserIndex = currentPlayerIndex;
         currentCallValue = currentPlayerAction.value;
       }
-      console.log(currentPlayerIndex+":"+brain.getAction().name);
+      //console.log(currentPlayerIndex+":"+brain.getAction().name);
       // 最後までCHECKで回ったかどうか
       if (currentPlayerIndex === ((initialPlayerIndex + playerNum - 1) % playerNum) && brain.getAction().name === CHECK) {
         break;
@@ -152,9 +154,10 @@ export default class TexasHoldemModel {
   collectChipsToPod() {
     this.playerBrains.forEach((brain)=>{
       let action = brain.getAction(),
-        player = brain.getPlayer();
-      this.board.addChip(player.id, action.value);
-      player.pay(action.value);
+        player = brain.getPlayer(),
+        value = action === null ? 0 : action.value;
+      this.board.addChip(player.id, value);
+      player.pay(value);
       if (action.name === FOLD) {
         player.clear();
       }

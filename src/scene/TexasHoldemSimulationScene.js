@@ -22,17 +22,20 @@ export default class TexasHoldemSimulationScene {
       let gameModel = new TexasHoldemModel(this.players, this.bigBlind);
       this.players[0].setPlayer(new Player(this.playerId, this.initialStack));
       this.players[1].setPlayer(new Player(this.enemyId, this.initialStack));
-      console.log("game" + num + '開始');
       this.oneGame(gameModel);
-      console.log("game" + num + '完了');
     }
   }
 
   oneGame(gameModel) {
+    let num = 0,
+      winLooseString;
     while(false === gameModel.isFinished()) {
       this.onePlay(gameModel);
       gameModel.deleteDeadPlayer();
+      num++;
     }
+    winLooseString = gameModel.isExistPlayer(this.playerId) ? '○' : '×';
+    console.log(winLooseString + ',' + num);
   }
 
   onePlay(gameModel) {
@@ -40,10 +43,9 @@ export default class TexasHoldemSimulationScene {
       gameState = NEXT,
       winners,
       playerAction,
-      isLoose;
+      isWin;
     gameModel.dealCards();
     for (currentPhase = PRE_FLOP; currentPhase <= RIVER; currentPhase++) {
-      console.log('phase:'+currentPhase);
       if (currentPhase === FLOP) {
         gameModel.startFrop();
       } else if (currentPhase > FLOP) {
@@ -59,12 +61,12 @@ export default class TexasHoldemSimulationScene {
       gameModel.resetPlayersAction();
     }
     winners = gameModel.getWinners();
-    isLoose = winners.some(brain => this.playerId === brain.getPlayer().id);
+    isWin = winners.some(brain => this.playerId === brain.getPlayer().id);
     // ここで学習
     if (gameState === END && playerAction.name === FOLD) {
-      this.players[0].learnWhenFold(currentPhase, gameModel.getChipsInPod(), isLoose);
+      this.players[0].learnWhenFold(currentPhase, gameModel.getChipsInPod(), !isWin);
     } else {
-      this.players[0].learn(gameModel.getChipsInPod(), isLoose);
+      this.players[0].learn(gameModel.getChipsInPod(), !isWin);
     }
     gameModel.sharePodToWinners(winners);
   }

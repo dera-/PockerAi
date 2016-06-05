@@ -49,6 +49,12 @@ export default class MachineOpenedBoardState extends MachineState {
         return rank === state.rank && isFlushDraw === state.isFlushDraw && isStraightDraw === state.isStraightDraw && boardType === state.boardType && enemyAction === state.enemyAction; //&& myAction === state.myAction && stackSizeType === state.stackSize;
       });
     if (searched.length === 0) {
+      console.log(sortedMyHand);
+      console.log(boardCards);
+      console.log('rank:'+rank);
+      console.log('フラドロ:'+isFlushDraw);
+      console.log('ストドロ:'+isStraightDraw);
+      console.log('ボード:'+boardType);
       throw new Error('状態IDが見つかりませんでした');
     }
     return searched[0].id;

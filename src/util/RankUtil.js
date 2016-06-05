@@ -1,5 +1,5 @@
 import {SPADE, HEART, DIAMOND, CLOVER} from '../const/CardSuit';
-import {ROYAL_STRAIGHT_FLUSH, STRAIGHT_FLUSH, FOUR_CARD, FULL_HOUSE, FLUSH, STRAIGHT, THREE_CARD, TWO_PAIR, ONE_PAIR, NO_PAIR, STRONG_RANG, HIGH_THREE_CARD, MIDDLE_THREE_CARD, LOW_THREE_CARD, HIGH_TWO_PAIR, MIDDLE_TWO_PAIR, LOW_TWO_PAIR, ONE_PAIR_A, ONE_PAIR_K, ONE_PAIR_Q, ONE_PAIR_J, ONE_PAIR_MIDDLE, ONE_PAIR_LOW, NO_PAIR_A, NO_PAIR_K, NO_PAIR_Q, NO_PAIR_J, NO_PAIR_MIDDLE, NO_PAIR_LOW} from '../const/RankStrength'
+import {STRONG_RANK, ROYAL_STRAIGHT_FLUSH, STRAIGHT_FLUSH, FOUR_CARD, FULL_HOUSE, FLUSH, STRAIGHT, THREE_CARD, TWO_PAIR, ONE_PAIR, NO_PAIR, HIGH_THREE_CARD, MIDDLE_THREE_CARD, LOW_THREE_CARD, HIGH_TWO_PAIR, MIDDLE_TWO_PAIR, LOW_TWO_PAIR, ONE_PAIR_A, ONE_PAIR_K, ONE_PAIR_Q, ONE_PAIR_J, ONE_PAIR_MIDDLE, ONE_PAIR_LOW, NO_PAIR_A, NO_PAIR_K, NO_PAIR_Q, NO_PAIR_J, NO_PAIR_MIDDLE, NO_PAIR_LOW} from '../const/RankStrength'
 import Rank from '../model/Rank';
 
 export default class RankUtil {
@@ -8,36 +8,36 @@ export default class RankUtil {
       rank;
     rank = RankUtil.getStraightFlushRank(cards);
     if (rank !== null) {
-      console.log('ストフラ');
+      //console.log('ストフラ');
       return rank;
     }
     rank = RankUtil.getFourCardRank(cards);
     if (rank !== null) {
-      console.log('くわっず');
+      //console.log('くわっず');
       return rank;
     }
     rank = RankUtil.getFullHouseRank(cards);
     if (rank !== null) {
-      console.log('フルハウス');
+      //console.log('フルハウス');
       return rank;
     }
     rank = RankUtil.getFlushRank(cards);
     if (rank !== null) {
-      console.log('ふらっしゅ');
+      //console.log('ふらっしゅ');
       return rank;
     }
     rank = RankUtil.getStraightRank(cards);
     if (rank !== null) {
-      console.log('ストレート');
+      //console.log('ストレート');
       return rank;
     }
     rank = RankUtil.getThreeCardRank(cards);
     if (rank !== null) {
-      console.log('スリーカード');
+      //console.log('スリーカード');
       return rank;
     }
     rank = RankUtil.getPairRank(cards);
-    console.log('ペア');
+    //console.log('ペア');
     return rank;
   }
 

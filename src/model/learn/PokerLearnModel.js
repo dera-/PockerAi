@@ -9,8 +9,8 @@ import {ALLIN_NUM, BIG_RAISE_NUM, MIDDLE_RAISE_NUM, SMALL_RAISE_NUM, CALL_NUM, C
 import ActionModel from '../ActionModel';
 import ActionUtil from '../../util/ActionUtil';
 
-const REWARD = 10;
-const PENALTY = -20;
+const REWARD = 50;
+const PENALTY = -200;
 
 export default class PokerLearnModel {
   constructor(initialStack) {
@@ -59,6 +59,7 @@ export default class PokerLearnModel {
   updateQValuesForOnePhase(value, history) {
     let nextQValue = null;
     history.forEach((qValue) => {
+      //console.log(qValue);
       if (nextQValue === null) {
         qValue.updatedScore(value, 0);
       } else {
@@ -121,6 +122,7 @@ export default class PokerLearnModel {
         this.riverActionHistory.push(qvalue);
         break;
     }
+    //console.log(qvalue);
     machineAction = MachineAction.getMachineAction(qvalue.actionId);
     return this.getActualAction(machineAction, actionPhase, board.getPotValue(), callValue, playerBrain);
   }

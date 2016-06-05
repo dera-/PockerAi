@@ -31,7 +31,7 @@ export default class PlayerBrain {
   }
 
   printAction() {
-    console.log('id:' + this.player.id + 'のアクションは' + this.action.name + '。賭け金は' + this.action.value);
+    //console.log('id:' + this.player.id + 'のアクションは' + this.action.name + '。賭け金は' + this.action.value);
   }
 
 }
