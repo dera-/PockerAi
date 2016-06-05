@@ -9,42 +9,35 @@ export default class RankUtil {
     rank = RankUtil.getStraightFlushRank(cards);
     if (rank !== null) {
       console.log('ストフラ');
-      console.log(rank);
       return rank;
     }
     rank = RankUtil.getFourCardRank(cards);
     if (rank !== null) {
       console.log('くわっず');
-      console.log(rank);
       return rank;
     }
     rank = RankUtil.getFullHouseRank(cards);
     if (rank !== null) {
       console.log('フルハウス');
-      console.log(rank);
       return rank;
     }
     rank = RankUtil.getFlushRank(cards);
     if (rank !== null) {
       console.log('ふらっしゅ');
-      console.log(rank);
       return rank;
     }
     rank = RankUtil.getStraightRank(cards);
     if (rank !== null) {
       console.log('ストレート');
-      console.log(rank);
       return rank;
     }
     rank = RankUtil.getThreeCardRank(cards);
     if (rank !== null) {
       console.log('スリーカード');
-      console.log(rank);
       return rank;
     }
     rank = RankUtil.getPairRank(cards);
     console.log('ペア');
-    console.log(rank);
     return rank;
   }
 
