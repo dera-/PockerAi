@@ -12,20 +12,10 @@ export default class PlayerBrain {
     return this.player;
   }
 
-  // テストとしてエニハンコールマンを実装
-  // TODO: ここの処理をちゃんと実装する
-  decideAction(callValue) {
-    if (this.action === null) {
-      this.action = new ActionModel(CHECK, 0);
-    } else if (this.action.value === callValue) {
-      this.action = new ActionModel(CHECK, callValue);
-    } else {
-      this.action = new ActionModel(CALL, callValue);
-    }
+  decideAction(actionPhase, enemyBrain, board, callValue) {}
 
-    if (this.action.value >= this.player.getStack()) {
-      this.action = new ActionModel(ALLIN, this.player.getStack());
-    }
+  setPlayer(player) {
+    this.player = player;
   }
 
   setAction(name, value) {
