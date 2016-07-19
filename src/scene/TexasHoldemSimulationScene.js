@@ -2,7 +2,7 @@ import {NEXT, END, SHOWDOWN} from '../const/GameState';
 import {PRE_FLOP, FLOP, TURN, RIVER} from '../const/ActionPhase';
 import Player from '../model/Player';
 import PlayerBrain from '../model/PlayerBrain';
-import AnyHandCallManBrain from '../model/AnyHandCallManBrain';
+import DocileManBrain from '../model/DocileManBrain';
 import MachineLearnBrain from '../model/MachineLearnBrain';
 import TexasHoldemModel from '../model/TexasHoldemModel';
 import {FOLD} from '../const/ActionName';
@@ -14,7 +14,7 @@ export default class TexasHoldemSimulationScene {
     this.initialStack = initialStack;
     this.playerId = 1;
     this.enemyId = 2;
-    this.players = [new MachineLearnBrain(new Player(this.playerId, this.initialStack)), new AnyHandCallManBrain(new Player(this.enemyId, this.initialStack))];
+    this.players = [new MachineLearnBrain(new Player(this.playerId, this.initialStack)), new DocileManBrain(new Player(this.enemyId, this.initialStack))];
   }
 
   run() {
@@ -24,6 +24,7 @@ export default class TexasHoldemSimulationScene {
       this.players[1].setPlayer(new Player(this.enemyId, this.initialStack));
       this.oneGame(gameModel);
     }
+    this.players[0].save();
   }
 
   oneGame(gameModel) {

@@ -29,6 +29,10 @@ export default class QValue {
     return comp + GAMMA_VALUE * next - this.score;
   }
 
+  getCsvData() {
+    return this.stateId + ',' + this.actionId + ',' + this.score;
+  }
+
   static getLambdaValue() {
     return LAMBDA_VALUE;
   }

@@ -23,4 +23,27 @@ export default class QvalueFactory {
     }
     return qValueMap;
   }
+
+  generateMapByCsv(csvDatas) {
+    const qValueMap = new Map();
+    let currentStateId = -1,
+      qValues = [];
+    csvDatas.forEach(csv => {
+      const qValue = this.generateByCsv(csv);
+      if (currentStateId === -1) {
+        currentStateId = qValue.stateId;
+      } else if (currentStateId !== qValue.stateId) {
+        qValueMap.set(currentStateId, qValues);
+        qValues = [];
+        currentStateId = qValue.stateId;
+      }
+      qValues.push(qValue);
+    });
+    return qValueMap;
+  }
+
+  generateByCsv(csvData) {
+    const values = csvData.split(',');
+    return new QValue(parseInt(values[0], 10), parseInt(values[1], 10), parseInt(values[2], 10));
+  }
 }

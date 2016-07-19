@@ -21,4 +21,8 @@ export default class MachineLearnBrain extends PlayerBrain {
     this.pokerLearnModel.updateQValue(actionPhase, chip, isLoose);
     this.pokerLearnModel.deleteHistories();
   }
+
+  save() {
+    this.pokerLearnModel.saveQvaluesData();
+  }
 }

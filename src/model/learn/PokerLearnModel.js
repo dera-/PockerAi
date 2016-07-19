@@ -8,18 +8,26 @@ import {ALLIN, RAISE, CALL, CHECK, FOLD, NONE} from '../../const/ActionName';
 import {ALLIN_NUM, BIG_RAISE_NUM, MIDDLE_RAISE_NUM, SMALL_RAISE_NUM, CALL_NUM, CHECK_NUM, FOLD_NUM} from '../../const/MachineActionNumber';
 import ActionModel from '../ActionModel';
 import ActionUtil from '../../util/ActionUtil';
+import FileUtil from '../../util/FileUtil';
 
 const REWARD = 10;
 const PENALTY = -10;
 
 export default class PokerLearnModel {
-  constructor(initialStack) {
+  constructor(initialStack, useFile = false) {
     let qValueFactory = new QValueFactory();
     this.initialStack = initialStack;
-    this.preFlopQValueMap = qValueFactory.generateMapForPreFlopState();
-    this.flopQValueMap = qValueFactory.generateMapForOpenedBoardState();
-    this.turnQValueMap = qValueFactory.generateMapForOpenedBoardState();
-    this.riverQValueMap = qValueFactory.generateMapForOpenedBoardState();
+    if (useFile) {
+      this.preFlopQValueMap = qValueFactory.generateMapByCsv(FileUtil.getContent('preFlopQValues.csv'));
+      this.flopQValueMap = qValueFactory.generateMapByCsv(FileUtil.getContent('flopQValues.csv'));
+      this.turnQValueMap = qValueFactory.generateMapByCsv(FileUtil.getContent('turnQValues.csv'));
+      this.riverQValueMap = qValueFactory.generateMapByCsv(FileUtil.getContent('riverQValues.csv'));
+    } else {
+      this.preFlopQValueMap = qValueFactory.generateMapForPreFlopState();
+      this.flopQValueMap = qValueFactory.generateMapForOpenedBoardState();
+      this.turnQValueMap = qValueFactory.generateMapForOpenedBoardState();
+      this.riverQValueMap = qValueFactory.generateMapForOpenedBoardState();
+    }
     this.preFlopActionHistory = [];
     this.flopActionHistory = [];
     this.turnActionHistory = [];
@@ -193,5 +201,27 @@ export default class PokerLearnModel {
       }
     }
     return probabilities;
+  }
+
+  saveQvaluesData() {
+    FileUtil.saveContent('preFlopQValues.csv', this.getQValueCsvDatas(this.preFlopQValueMap));
+    console.log('preFlop');
+    FileUtil.saveContent('flopQValues.csv', this.getQValueCsvDatas(this.flopQValueMap));
+    console.log('flop');
+    FileUtil.saveContent('turnQValues.csv', this.getQValueCsvDatas(this.turnQValueMap));
+    console.log('turn');
+    FileUtil.saveContent('riverQValues.csv', this.getQValueCsvDatas(this.riverQValueMap));
+    console.log('river');
+  }
+
+  getQValueCsvDatas(map) {
+    console.log('aaaaaaaaaaaaa');
+    let qValues = [];
+    for (let values of map.values()) {
+      const datas = values.map(value => value.getCsvData());
+      qValues = qValues.concat(datas);
+      console.log(qValues.length);
+    }
+    return qValues;
   }
 }

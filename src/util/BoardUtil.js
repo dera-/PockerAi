@@ -47,4 +47,11 @@ export default class BoardUtil {
   static getExistsType(board) {
     return board.some(card => card.number === 14) ? EXIST_ACE : 0;
   }
+
+  // 現在のボード状態を判定するための即席的なやつ
+  static isMatch(boardType, targetType) {
+    const digit = String(targetType).length;
+    const board = boardType % (10*(digit+1));
+    return board - targetType >= 0;
+  }
 }
